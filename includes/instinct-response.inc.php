@@ -9,11 +9,13 @@ class InstinctResponse {
     private $status;
     private $data_payload;
     private $output_type;
+    private $interface_title;
 
-    function __construct($data, $status = INSTINCT_STATUS_OK, $output_type = "json") {
+    function __construct($data, $status = INSTINCT_STATUS_OK, $output_type = "json", $title = "") {
         $this->data_payload = $data;
         $this->status = $status;
         $this->output_type = $output_type;
+        $this->interface_title = $title;
     }
 
     function compose() {
@@ -34,6 +36,8 @@ class InstinctResponse {
     function to_iframe() {
         add_action("wp_enqueue_scripts", function() {
                     wp_enqueue_script("jquery");
+                    wp_enqueue_style("buttons");
+                    //wp_enqueue_style("wp-admin");
                 }, 99999);
         ob_start();
         ?><!DOCTYPE html>
@@ -42,26 +46,87 @@ class InstinctResponse {
                 wp_head();
                 ?>
                 <script type="text/javascript">
-                                    
+                                                                                            
                     var instinct = window.parent.angular.element("body").scope();
-                                    
+                    var iframe = window.parent.jQuery("#instinct-interface");
+                    
                     jQuery(window).load(function(){
-                                                                                                            
-                        var iframe = window.parent.jQuery("#instinct-interface");
-                                                                     
+                                                                                                                                                                    
+                                
+                                                                                                                             
                         instinct.update_hatch_element(jQuery(document).height());
                         iframe.css({height: jQuery(document).height()});
-                                                                                                            
+                                                        
+                        iframe.css({
+                            display: "block",
+                            visibility: "visible",
+                            width: jQuery(document).width()
+                        });
+                                
+                               
+                                                                                                                                                                    
+                    });
+                                                            
+                    jQuery(document).ready(function(){
+                        jQuery("#instinct-close").click(function(e){
+                            e.preventDefault();
+                                                                                    
+                            instinct.close_hatch();
+                        });
+                        
                     });
                                                                             
-                                
-                                                                                            
-                                                                            
-                                                                                            
-                                                                                            
-                                                                                                    
                 </script>
                 <style type="text/css">
+
+                    /* http://meyerweb.com/eric/tools/css/reset/ 
+        v2.0 | 20110126
+        License: none (public domain)
+                    */
+
+                    html, body, div, span, applet, object, iframe,
+                    h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+                    a, abbr, acronym, address, big, cite, code,
+                    del, dfn, em, img, ins, kbd, q, s, samp,
+                    small, strike, strong, sub, sup, tt, var,
+                    b, u, i, center,
+                    dl, dt, dd, ol, ul, li,
+                    fieldset, form, label, legend,
+                    table, caption, tbody, tfoot, thead, tr, th, td,
+                    article, aside, canvas, details, embed, 
+                    figure, figcaption, footer, header, hgroup, 
+                    menu, nav, output, ruby, section, summary,
+                    time, mark, audio, video {
+                        margin: 0;
+                        padding: 0;
+                        border: 0;
+                        font-size: 100%;
+                        font: inherit;
+                        vertical-align: baseline;
+                    }
+                    /* HTML5 display-role reset for older browsers */
+                    article, aside, details, figcaption, figure, 
+                    footer, header, hgroup, menu, nav, section {
+                        display: block;
+                    }
+                    body {
+                        line-height: 1;
+                    }
+                    ol, ul {
+                        list-style: none;
+                    }
+                    blockquote, q {
+                        quotes: none;
+                    }
+                    blockquote:before, blockquote:after,
+                    q:before, q:after {
+                        content: '';
+                        content: none;
+                    }
+                    table {
+                        border-collapse: collapse;
+                        border-spacing: 0;
+                    }                   
 
                     html
                     {
@@ -70,28 +135,73 @@ class InstinctResponse {
 
                     body
                     {
-                        
+                        font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif;
 
                     }
 
                     .instinct-interface-container
                     {
-                        background-color: #fff;
+                        background-color: #f5f5f5;
+                        color: #333;
                         border: 1px solid #aeaeae;
                         border-radius: 5px;
                         -moz-border-radius: 5px;
                         -webkit-border-radius: 5px;
-                        padding: 5px;
+                        border-color: #dfdfdf;
+                        -webkit-box-shadow: inset 0 1px 0 #fff;
+                        box-shadow: inset 0 1px 0 #fff;
+
                     }
+
+                    .instinct-interface-content
+                    {
+                        padding: 10px;
+                    }
+
+                    .instinct-interface-container h1
+                    {
+
+                        color: #464646;
+                        line-height: 40px;
+                        margin-top: 0;
+
+                        font-size: 18px;
+                        font-weight: normal;
+                        border-radius: 5px 5px 0 0;
+                        -moz-border-radius: 5px 5px 0 0;
+                        -webkit-border-radius: 5px 5px 0 0;
+                        padding: 0 10px;
+
+                        background: #f1f1f1;
+                        background-image: -webkit-gradient(linear,left bottom,left top,from(#ececec),to(#f9f9f9));
+                        background-image: -webkit-linear-gradient(bottom,#ececec,#f9f9f9);
+                        background-image: -moz-linear-gradient(bottom,#ececec,#f9f9f9);
+                        background-image: -o-linear-gradient(bottom,#ececec,#f9f9f9);
+                        background-image: linear-gradient(to top,#ececec,#f9f9f9);
+
+                        border-bottom: 1px solid #dfdfdf;
+
+                        text-shadow: #fff 0 1px 0;
+                        -webkit-box-shadow: 0 1px 0 #fff;
+                        box-shadow: 0 1px 0 #fff;
+
+
+                    }
+
+                    
 
 
                 </style>
             </head>
             <body>
-                <div class="instinct-interface-container">
-                    <?php
-                    echo $this->data_payload;
-                    ?>
+
+                <div class="instinct-interface-container wp-core-ui">
+                    <h1><?php echo($this->interface_title); ?></h1>
+                    <div class="instinct-interface-content">
+                        <?php
+                        echo $this->data_payload;
+                        ?>
+                    </div>
                 </div>
 
                 <?php

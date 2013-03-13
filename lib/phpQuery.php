@@ -265,12 +265,13 @@ class DOMDocumentWrapper {
 		$this->isHTML = true;
 		if (!isset($this->isDocumentFragment))
 			$this->isDocumentFragment = self::isDocumentFragmentHTML($markup);
+                
 		$charset = null;
 		$documentCharset = $this->charsetFromHTML($markup);
 		$addDocumentCharset = false;
 		if ($documentCharset) {
 			$charset = $documentCharset;
-			$markup = $this->charsetFixHTML($markup);
+			// $markup = $this->charsetFixHTML($markup);
 		} else if ($requestedCharset) {
 			$charset = $requestedCharset;
 		}

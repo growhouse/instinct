@@ -4,7 +4,9 @@ class InstinctHatch {
 
     public $id = false;
     public $hint = false;
-
+    public $allow_content_wrapping = true; // Set to false to exclude hatch from automatic content wrapping if enabled system-wide 
+    public static $title = "";
+    
     static function exists($hatch_name)
     {
         // Return true if hatch exists and is valid, false if not
@@ -26,7 +28,7 @@ class InstinctHatch {
 
     function _tag($content = "") {
         if (!Instinct::$inhibit)
-            return "<instinct-wrap x-instinct-hatch='" . $this->_data() . "'>" . $content . "</instinct-wrap>";
+            return Instinct::content_wrap("<instinct-wrap x-instinct-hatch='" . $this->_data() . "'>" . $content . "</instinct-wrap>");
         else
             return $content;
     }

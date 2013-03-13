@@ -3,6 +3,7 @@
 class InstinctHatchPostContent extends InstinctHatch {
 
     public $hint = "Edit this post";
+    public static $title = "Edit post";
 
     public function edit() {
         return new InstinctResponse(ob_get_clean(), INSTINCT_STATUS_OK);
@@ -33,6 +34,10 @@ class InstinctHatchPostContent extends InstinctHatch {
                                             
                     instinct.savehatch(tinymce.activeEditor.getContent());
                 });
+                
+                
+                
+                
                                                         
             });
         </script>
@@ -55,10 +60,11 @@ class InstinctHatchPostContent extends InstinctHatch {
         echo '<form action="" method="post" target="_blank">';
         wp_editor($thepost->post_content, 'InstinctHatchPostContent');
         ?>
-        <div class="wp-core-ui">
-            <a href="#" id="instinct-save" class="button">Save</a>
+        <br />
+            <a href="#" id="instinct-save" class="button button-primary">Save</a>
+            <a href="#" id="instinct-close" class="button">Close</a>
 
-        </div>    
+           
         <?php
         echo '</form>';
 

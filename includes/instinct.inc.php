@@ -2,14 +2,18 @@
 define("INSTINCT_SIG_OPEN", "%!%");
 define("INSTINCT_SIG_CLOSE", "%!%");
 
+define("INSTINCT_DEBUG_PARTCOMPILE", false);
+
 class Instinct {
 
     public static $inhibit = false;
     private static $hatches = array();
     private static $interface_markup = "";
+    
+    private static $content_wrap = true;
 
     static function inject($handle, $id = false, $content = "") {
-        if (is_admin() || !is_user_logged_in())
+        if (is_admin() || !is_user_logged_in() || self::$inhibit)
             return $content;
 
         global $post;
@@ -22,7 +26,7 @@ class Instinct {
     }
 
     static function inject_parent($handle, $id = false, $content = "") {
-        if (is_admin() || !is_user_logged_in())
+        if (is_admin() || !is_user_logged_in() || self::$inhibit)
             return $content;
 
         global $post;
@@ -35,7 +39,7 @@ class Instinct {
     }
 
     static function inject_adjacent($handle, $id = false) {
-        if (is_admin() || !is_user_logged_in())
+        if (is_admin() || !is_user_logged_in() || self::$inhibit)
             return;
 
         global $post;
@@ -67,7 +71,10 @@ class Instinct {
 
         $doc = phpQuery::newDocument($doc);
 
-
+        if(defined("INSTINCT_DEBUG_PARTCOMPILE") && INSTINCT_DEBUG_PARTCOMPILE)
+        {
+            return $doc;
+        }
 
         // Wrappables
 
@@ -109,12 +116,16 @@ class Instinct {
 
         // Finally, inject hatch interfaces
 
-
-
-
         return $doc;
     }
 
+    public static function content_wrap($content)
+    {
+        if(self::$content_wrap)
+            return "<div>".$content."</div>";
+        return $content;
+    }
+    
     public static function write_ajax_url() {
         ?>
         <script type="text/javascript">
@@ -130,7 +141,7 @@ class Instinct {
         add_action("wp_head", function() {
                     Instinct::$inhibit = false;
                 }, 999999); // End of WP_Head action, uninhibit
-        //add_action("wp_footer", function(){ Instinct::$inhibit = true; }, 0); // Start of WP_Footer action, inhibit
+        add_action("wp_footer", function(){ Instinct::$inhibit = true; }, 0); // Start of WP_Footer action, inhibit
     }
 
     public function hatch_register($name, $settings = array()) {
@@ -163,7 +174,7 @@ class Instinct {
             }
 
         </style>
-        <iframe id="instinct-interface" class="instinct-interface" frameborder="0" src="" scrolling="no">
+        <iframe id="instinct-interface" class="instinct-interface" frameborder="0" src="" scrolling="no" allowtransparency="true">
         Your browser must support frames.
         </iframe>
 

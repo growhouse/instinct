@@ -23,13 +23,15 @@ class InstinctAjax {
 
         if (!self::validate_request($data))
             return new InstinctResponse("Invalid Request", INSTINCT_STATUS_VALIDATIONERROR);
+        
+        Instinct::$inhibit = true;
 
         $hatch = new $data['ih'](); // Messy code - $data['ih'] assumed safe to instanciate after self::validate_request()
 
         switch ($data['ia']) {
             case "interface":
             default:
-                return new InstinctResponse($data['ih']::render_interface($data['ii']), INSTINCT_STATUS_OK, "iframe");
+                return new InstinctResponse($data['ih']::render_interface($data['ii']), INSTINCT_STATUS_OK, "iframe", $data['ih']::$title);
                 break;
             case "save":
                 return $hatch->save($data['ii'], $data['id']);

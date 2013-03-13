@@ -3,6 +3,7 @@
 class InstinctHatchPostTitle extends InstinctHatch {
 
     public $hint = "Edit this posts title";
+    public static $title = "Post Title";
 
     public function save($id, $data) {
 
@@ -35,7 +36,8 @@ class InstinctHatchPostTitle extends InstinctHatch {
         </script>
         <form>
             <input name="title" value="<?php echo($p->post_title); ?>" />
-            <input type="submit" id="instinct-save" value="Save" />
+            <a href="#" id="instinct-save" class="button button-primary">Save</a>
+            <a href="#" id="instinct-close" class="button">Close</a>
         </form>
         <?php
         return ob_get_clean();
