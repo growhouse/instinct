@@ -9,6 +9,7 @@ add_filter("option_blogname", function($val) {
 class InstinctHatchSiteName extends InstinctHatch {
     
     public static $title = "Site Name";
+    public $hint = "Edit site name";
     
     public function save($id, $data) {
 
@@ -52,7 +53,7 @@ add_filter("option_blogdescription", function($val) {
 class InstinctHatchSiteDescription extends InstinctHatch {
     
     public static $title = "Site Description";
-    
+    public $hint = "Edit site description";
     public function save($id, $data) {
 
         update_option("blogdescription", $data);

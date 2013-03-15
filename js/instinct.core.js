@@ -14,23 +14,32 @@ _instinct.
                 //console.log(attrs);
       
                 elm.bind("mouseover", function(){
+                    if(!scope.edit_mode)
+                        return;
                     jQuery(this).stop().animate({
-                        boxShadow: "0 0 10px #44f"
-                    });
-                    //jQuery(".instinct-hinter").stop().fadeIn();
+                        opacity: 0.25
+                        
+                    }, 100);
+                    jQuery(this).css({cursor: "pointer"});
+                    jQuery(".instinct-hinter").stop(true,true).fadeIn(100);
                     scope.hint(data.hint);
                 });
             
                 elm.bind("mouseout", function(){
+                    if(!scope.edit_mode)
+                        return;
                     jQuery(this).stop().animate({
-                        boxShadow: "0 0 0px #44f"
+                        opacity: 1
                     });
                
-                    jQuery(".instinct-hinter").fadeOut();
+                    jQuery(this).css({cursor: ""});
+               
+                    jQuery(".instinct-hinter").stop(true,true).fadeOut();
                 });
             
                 elm.bind("click", function(e){
-                    
+                    if(!scope.edit_mode)
+                        return;
                     e.preventDefault();
                     var interf = jQuery("iframe.instinct-interface");
                     
@@ -112,6 +121,7 @@ function editableCtrl($scope, $http, $rootScope){
     $scope.hint_msg = '';
     $scope.hatch = false;
     $scope.element = false;
+    $scope.edit_mode = false;
         
     $scope.hint = function(msg){
         if(msg)
@@ -182,6 +192,13 @@ function editableCtrl($scope, $http, $rootScope){
             ele: $scope.element
         });
     }
+    
+    $scope.toggle_edit_mode = function(){
+        $scope.edit_mode = !$scope.edit_mode;
+        if($scope.edit_mode == false)
+            $scope.close_hatch();
+        
+    };
     
     
 };

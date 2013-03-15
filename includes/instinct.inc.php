@@ -9,7 +9,6 @@ class Instinct {
     public static $inhibit = false;
     private static $hatches = array();
     private static $interface_markup = "";
-    
     private static $content_wrap = true;
 
     static function inject($handle, $id = false, $content = "") {
@@ -71,8 +70,7 @@ class Instinct {
 
         $doc = phpQuery::newDocument($doc);
 
-        if(defined("INSTINCT_DEBUG_PARTCOMPILE") && INSTINCT_DEBUG_PARTCOMPILE)
-        {
+        if (defined("INSTINCT_DEBUG_PARTCOMPILE") && INSTINCT_DEBUG_PARTCOMPILE) {
             return $doc;
         }
 
@@ -119,17 +117,31 @@ class Instinct {
         return $doc;
     }
 
-    public static function content_wrap($content)
-    {
-        if(self::$content_wrap)
-            return "<div>".$content."</div>";
+    public static function content_wrap($content) {
+        if (self::$content_wrap)
+            return "<div>" . $content . "</div>";
         return $content;
     }
-    
+
     public static function write_ajax_url() {
         ?>
         <script type="text/javascript">
             var _INSTINCT_AJAX_URL = "<?php echo(INSTINCT_AJAX_URL); ?>";
+            jQuery(document).ready(function(){
+                var instinct = angular.element("body").scope();
+                                                            
+                jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(){
+                                                            
+                    if(instinct.edit_mode)
+                        jQuery("span.instinct-adminbar-label",this).html("Quick Edit");
+                    else
+                        jQuery("span.instinct-adminbar-label",this).html("Stop Editing");
+                                                            
+                    instinct.toggle_edit_mode();
+                });
+            });
+                                                            
+                                                            
         </script>
         <?php
     }
@@ -141,7 +153,9 @@ class Instinct {
         add_action("wp_head", function() {
                     Instinct::$inhibit = false;
                 }, 999999); // End of WP_Head action, uninhibit
-        add_action("wp_footer", function(){ Instinct::$inhibit = true; }, 0); // Start of WP_Footer action, inhibit
+        add_action("wp_footer", function() {
+                    Instinct::$inhibit = true;
+                }, 0); // Start of WP_Footer action, inhibit
     }
 
     public function hatch_register($name, $settings = array()) {
@@ -149,14 +163,16 @@ class Instinct {
     }
 
     public static function add_toolbar_items($admin_bar) {
-        $admin_bar->add_menu(array(
-            'id' => 'instinct-edit-mode',
-            'title' => 'Edit Mode',
-            'href' => 'javascript: _INSTINCT_EDIT_MODE = true;',
-            'meta' => array(
-                'title' => __('Edit Mode'),
-            ),
-        ));
+        if (!is_admin()) {
+            $admin_bar->add_menu(array(
+                'id' => 'instinct-edit-mode',
+                'title' => '<!--<span class="ab-icon"></span> --><span class="instinct-adminbar-label">Quick Edit</span>',
+                'href' => '#',
+                'meta' => array(
+                    'title' => __('Quick Edit'),
+                ),
+            ));
+        }
     }
 
     public static function interface_chrome() {
@@ -166,6 +182,7 @@ class Instinct {
             {
                 display: none;
                 overflow: hidden;
+                z-index: 99998;
             }
 
             .instinct-hidden
@@ -173,6 +190,40 @@ class Instinct {
                 visibility: hidden;
             }
 
+            .wp-pointer-content
+            {
+                font-family: sans-serif;
+                font-size: 13px;
+                line-height: 1.4em;
+                color: #333;
+
+            }
+
+            .wp-pointer-content p
+            {
+                padding: 0 15px;
+                margin: 15px 0;
+            }
+
+            .wp-pointer-content h3
+            {
+                display: block;
+                font-weight: bold;
+                font-family: sans-serif;
+                font-size: 15px;
+            }
+
+            .wp-pointer-buttons a
+            {
+                color: #aaa;
+
+
+            }
+
+            .wp-pointer-buttons a:hover
+            {
+                color: #8cc1e9;
+            }
         </style>
         <iframe id="instinct-interface" class="instinct-interface" frameborder="0" src="" scrolling="no" allowtransparency="true">
         Your browser must support frames.
@@ -210,6 +261,15 @@ add_action("init", function() {
 
                 add_action("wp_enqueue_scripts", function() {
 
+                            //hook the pointer 
+
+                            if (get_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro", true) == "") {
+                                wp_enqueue_style('wp-pointer');
+                                wp_enqueue_script('wp-pointer');
+                                wp_enqueue_script("instinct-tooltips", plugins_url("js/instinct-tooltips.js", INSTINCT_FILE), array("jquery", "wp-pointer"));
+                                add_user_meta(get_current_user_id(),"instinct-tooltip-editmodeintro","1");
+                                
+                            }
                             wp_enqueue_script("angularjs", "https://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js", array("jquery"));
                             wp_enqueue_script("jquery-animateshadow", plugins_url("js/jquery.animate-shadow-min.js", INSTINCT_FILE), array("jquery"));
                             wp_enqueue_script("instinct-core", plugins_url("js/instinct.core.js", INSTINCT_FILE), array("angularjs", "jquery-animateshadow"));
@@ -220,7 +280,7 @@ add_action("init", function() {
                             Instinct::write_ajax_url();
                         });
 
-                add_action('admin_bar_menu', array('Instinct', 'add_toolbar_items'), 100);
+                add_action('admin_bar_menu', array('Instinct', 'add_toolbar_items'), 70);
             }
         });
 
@@ -241,3 +301,6 @@ add_action("setup_theme", function() {
 
 
 
+register_deactivation_hook(INSTINCT_FILE, function(){
+    delete_user_meta(get_current_user_id(),"instinct-tooltip-editmodeintro");
+});

@@ -150,7 +150,8 @@ class InstinctResponse {
                         border-color: #dfdfdf;
                         -webkit-box-shadow: inset 0 1px 0 #fff;
                         box-shadow: inset 0 1px 0 #fff;
-
+                        
+                        min-width: 350px;
                     }
 
                     .instinct-interface-content

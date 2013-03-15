@@ -2,8 +2,8 @@
 
 class InstinctHatchPostTitle extends InstinctHatch {
 
-    public $hint = "Edit this posts title";
-    public static $title = "Post Title";
+    public $hint = "Edit the title";
+    public static $title = "Title";
 
     public function save($id, $data) {
 
