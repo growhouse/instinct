@@ -35,7 +35,7 @@ class InstinctHatchPostTitle extends InstinctHatch {
             });
         </script>
         <form>
-            <input name="title" value="<?php echo($p->post_title); ?>" />
+            <input name="title" value="<?php echo($p->post_title); ?>" style="width: 330px;"/>
             <a href="#" id="instinct-save" class="button button-primary">Save</a>
             <a href="#" id="instinct-close" class="button">Close</a>
         </form>

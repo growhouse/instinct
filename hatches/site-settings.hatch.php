@@ -34,7 +34,7 @@ class InstinctHatchSiteName extends InstinctHatch {
             });
         </script>
         <form>
-            <input name="title" value="<?php echo(get_option("blogname")); ?>" />
+            <input name="title" value="<?php echo(get_option("blogname")); ?>" style="width: 490px;" />
             <a href="#" id="instinct-save" class="button button-primary">Save</a>
             <a href="#" id="instinct-close" class="button">Close</a>
         </form>
@@ -77,7 +77,7 @@ class InstinctHatchSiteDescription extends InstinctHatch {
             });
         </script>
         <form>
-            <input name="title" value="<?php echo(get_option("blogdescription")); ?>" />
+            <input name="title" value="<?php echo(get_option("blogdescription")); ?>" style="width: 490px;" />
             <a href="#" id="instinct-save" class="button button-primary">Save</a>
             <a href="#" id="instinct-close" class="button">Close</a>
         </form>

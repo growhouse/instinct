@@ -9,10 +9,10 @@ class Instinct {
     public static $inhibit = false;
     private static $hatches = array();
     private static $interface_markup = "";
-    private static $content_wrap = true;
+    private static $content_wrap = false;
 
     static function inject($handle, $id = false, $content = "") {
-        if (is_admin() || !is_user_logged_in() || self::$inhibit)
+        if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
             return $content;
 
         global $post;
@@ -25,7 +25,7 @@ class Instinct {
     }
 
     static function inject_parent($handle, $id = false, $content = "") {
-        if (is_admin() || !is_user_logged_in() || self::$inhibit)
+        if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
             return $content;
 
         global $post;
@@ -38,7 +38,7 @@ class Instinct {
     }
 
     static function inject_adjacent($handle, $id = false) {
-        if (is_admin() || !is_user_logged_in() || self::$inhibit)
+        if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
             return;
 
         global $post;
@@ -68,11 +68,13 @@ class Instinct {
                     return str_replace(INSTINCT_SIG_OPEN, "", str_replace(INSTINCT_SIG_OPEN, "", urldecode($matches[0])));
                 }, $doc);
 
-        $doc = phpQuery::newDocument($doc);
-
         if (defined("INSTINCT_DEBUG_PARTCOMPILE") && INSTINCT_DEBUG_PARTCOMPILE) {
             return $doc;
         }
+
+        $doc = phpQuery::newDocument($doc);
+
+
 
         // Wrappables
 
@@ -129,19 +131,19 @@ class Instinct {
             var _INSTINCT_AJAX_URL = "<?php echo(INSTINCT_AJAX_URL); ?>";
             jQuery(document).ready(function(){
                 var instinct = angular.element("body").scope();
-                                                            
-                jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(){
-                                                            
+                                                                                    
+                jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(e){
+                    e.preventDefault();
                     if(instinct.edit_mode)
                         jQuery("span.instinct-adminbar-label",this).html("Quick Edit");
                     else
                         jQuery("span.instinct-adminbar-label",this).html("Stop Editing");
-                                                            
+                                                                                    
                     instinct.toggle_edit_mode();
                 });
             });
-                                                            
-                                                            
+                                                                                    
+                                                                                    
         </script>
         <?php
     }
@@ -216,7 +218,9 @@ class Instinct {
             .wp-pointer-buttons a
             {
                 color: #aaa;
-
+                font-weight: normal;
+                font-family: sans-serif;
+                font-size: 15px;
 
             }
 
@@ -224,10 +228,47 @@ class Instinct {
             {
                 color: #8cc1e9;
             }
+
+            #instinct-loader
+            {
+                position: fixed;
+                top: 0;
+                left: 0;
+                background-color: rgba(51,51,51,0.75);
+                color: #fff;
+                width: 100%;
+                height: 100%;
+                display: none;
+                z-index: 99998;
+            }
+            #instinct-load-message
+            {
+                
+                display: table-cell;
+                vertical-align: middle; 
+                text-align: center; 
+                font-family: sans-serif;
+                font-size: 34px;
+            }
+            
+            #instinct-load-message small
+            {
+                color: #fff;
+                font-size: 12px;
+                text-transform: uppercase;
+                font-weight: bold;
+            }
+
         </style>
         <iframe id="instinct-interface" class="instinct-interface" frameborder="0" src="" scrolling="no" allowtransparency="true">
         Your browser must support frames.
         </iframe>
+        <div id="instinct-loader">
+            <div id="instinct-load-message">
+                Please Wait<br />
+                <small>Loading on-page editor</small>
+            </div>
+        </div>
 
         <?php
     }
@@ -235,7 +276,7 @@ class Instinct {
 }
 
 add_action("init", function() {
-            if (is_user_logged_in()) {
+            if (is_user_logged_in() && !is_admin() && !is_login_page()) {
 
                 Instinct::auto_inhibition();
                 InstinctAjax::init();
@@ -267,8 +308,7 @@ add_action("init", function() {
                                 wp_enqueue_style('wp-pointer');
                                 wp_enqueue_script('wp-pointer');
                                 wp_enqueue_script("instinct-tooltips", plugins_url("js/instinct-tooltips.js", INSTINCT_FILE), array("jquery", "wp-pointer"));
-                                add_user_meta(get_current_user_id(),"instinct-tooltip-editmodeintro","1");
-                                
+                                add_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro", "1");
                             }
                             wp_enqueue_script("angularjs", "https://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js", array("jquery"));
                             wp_enqueue_script("jquery-animateshadow", plugins_url("js/jquery.animate-shadow-min.js", INSTINCT_FILE), array("jquery"));
@@ -301,6 +341,6 @@ add_action("setup_theme", function() {
 
 
 
-register_deactivation_hook(INSTINCT_FILE, function(){
-    delete_user_meta(get_current_user_id(),"instinct-tooltip-editmodeintro");
-});
+register_deactivation_hook(INSTINCT_FILE, function() {
+            delete_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro");
+        });

@@ -20,7 +20,9 @@ _instinct.
                         opacity: 0.25
                         
                     }, 100);
-                    jQuery(this).css({cursor: "pointer"});
+                    jQuery(this).css({
+                        cursor: "pointer"
+                    });
                     jQuery(".instinct-hinter").stop(true,true).fadeIn(100);
                     scope.hint(data.hint);
                 });
@@ -32,7 +34,9 @@ _instinct.
                         opacity: 1
                     });
                
-                    jQuery(this).css({cursor: ""});
+                    jQuery(this).css({
+                        cursor: ""
+                    });
                
                     jQuery(".instinct-hinter").stop(true,true).fadeOut();
                 });
@@ -50,13 +54,21 @@ _instinct.
                     jQuery(this).addClass("instinct-hidden");
                 
                     jQuery(this).data("orig-height", jQuery(this).css("height"));
-                
+                    
+                    jQuery("#instinct-loader").css({display: "table"});
+                    jQuery("#instinct-loader").fadeIn();
                     interf.css({
                         display: "none",
                         visibility: "hidden"
                     });
                     var eleoffset = jQuery(this).offset();
-                
+                    
+                    eleoffset.top += parseInt(jQuery(this).css("padding-top"));
+                    eleoffset.top += parseInt(jQuery(this).css("border-top-width"));
+                    
+                    eleoffset.left += parseInt(jQuery(this).css("padding-left"));
+                    eleoffset.left += parseInt(jQuery(this).css("border-left-width"));
+                    
                     interf.attr("src", "/instinctajax/?ia=interface&ih="+data.hatch+"&ii="+data.id);
                     interf.css({
                         position: "absolute",
@@ -110,6 +122,14 @@ _instinct.
                     jQuery(".instinct-hidden").removeClass("instinct-hidden");
                     jQuery("iframe.instinct-interface").css({
                         display: "none"
+                    });
+                });
+            
+                $rootScope.$on('instinct-hinter-refresh', function(event, data) {
+                    jQuery(".instinct-hinter").stop(true,true).fadeIn(100, function(){
+                        setTimeout(function(){
+                            jQuery(".instinct-hinter").fadeOut();
+                        },1000)
                     });
                 });
             }
@@ -196,7 +216,18 @@ function editableCtrl($scope, $http, $rootScope){
     $scope.toggle_edit_mode = function(){
         $scope.edit_mode = !$scope.edit_mode;
         if($scope.edit_mode == false)
+        {
             $scope.close_hatch();
+            $scope.hint("You are now viewing this page");
+            $rootScope.$broadcast("instinct-hinter-refresh");
+        }
+        else
+        {
+            $scope.hint("Quick edit mode enabled!");
+            $rootScope.$broadcast("instinct-hinter-refresh");
+        }
+            
+        
         
     };
     

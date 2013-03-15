@@ -49,6 +49,7 @@ class InstinctResponse {
                                                                                             
                     var instinct = window.parent.angular.element("body").scope();
                     var iframe = window.parent.jQuery("#instinct-interface");
+                    var loader = window.parent.jQuery("#instinct-loader");
                     
                     jQuery(window).load(function(){
                                                                                                                                                                     
@@ -62,6 +63,11 @@ class InstinctResponse {
                             visibility: "visible",
                             width: jQuery(document).width()
                         });
+                        loader.fadeOut(300, function(){
+                            loader.css({display: "none"});
+                        });
+                        
+                        
                                 
                                
                                                                                                                                                                     
