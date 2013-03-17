@@ -3,7 +3,7 @@
 class InstinctHatchPostTitle extends InstinctHatch {
 
     public $hint = "Edit the title";
-    public static $title = "Title";
+    public $title = "Title";
     public $imode = INSTINCT_IMODE_CHAMELEON;
 
     public function save($id, $data) {
@@ -19,7 +19,7 @@ class InstinctHatchPostTitle extends InstinctHatch {
         return new InstinctResponse($data, INSTINCT_STATUS_OK);
     }
 
-    public static function render_interface($id) {
+    public function render_interface($id) {
         $p = get_post($id);
         ob_start();
         ?>
@@ -44,11 +44,14 @@ class InstinctHatchPostTitle extends InstinctHatch {
         return ob_get_clean();
     }
 
-}
-
-add_filter("the_title", function($title, $id) {
+    public static function hook()
+    {
+        add_filter("the_title", function($title, $id) {
             $p = get_post($id);
             if ($p->post_type == "post" || $p->post_type == "page")
                 return Instinct::inject("InstinctHatchPostTitle", $id, $title);
             return $title;
         }, 999, 2);
+    }
+    
+}

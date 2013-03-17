@@ -1,14 +1,10 @@
 <?php
 
-add_filter("option_blogname", function($val) {
 
-            return Instinct::inject_parent("InstinctHatchSiteName", false). $val;
-            
-        }, 9999);
 
 class InstinctHatchSiteName extends InstinctHatch {
     
-    public static $title = "Site Name";
+    public $title = "Site Name";
     public $hint = "Edit site name";
     public $imode = INSTINCT_IMODE_CHAMELEON;
     
@@ -18,7 +14,7 @@ class InstinctHatchSiteName extends InstinctHatch {
         return new InstinctResponse($data, INSTINCT_STATUS_OK);
     }
     
-    public static function render_interface($id) {
+    public function render_interface($id) {
         
         ob_start();
         ?>
@@ -42,27 +38,33 @@ class InstinctHatchSiteName extends InstinctHatch {
         <?php
         return ob_get_clean();
     }
+    
+    public static function hook()
+    {
+        add_filter("option_blogname", function($val) {
+
+            return Instinct::inject_parent("InstinctHatchSiteName", false). $val;
+            
+        }, 9999);
+    }
 }
 
 
-add_filter("option_blogdescription", function($val) {
 
-            return Instinct::inject_parent("InstinctHatchSiteDescription", false). $val;
-            
-        }, 9999);
 
 class InstinctHatchSiteDescription extends InstinctHatch {
     
-    public static $title = "Site Description";
+    public $title = "Site Description";
     public $hint = "Edit site description";
     public $imode = INSTINCT_IMODE_CHAMELEON;
+    
     public function save($id, $data) {
 
         update_option("blogdescription", $data);
         return new InstinctResponse($data, INSTINCT_STATUS_OK);
     }
     
-    public static function render_interface($id) {
+    public function render_interface($id) {
         
         ob_start();
         ?>
@@ -85,6 +87,15 @@ class InstinctHatchSiteDescription extends InstinctHatch {
         </form>
         <?php
         return ob_get_clean();
+    }
+    
+    public static function hook()
+    {
+        add_filter("option_blogdescription", function($val) {
+
+            return Instinct::inject_parent("InstinctHatchSiteDescription", false). $val;
+            
+        }, 9999);
     }
 }
 

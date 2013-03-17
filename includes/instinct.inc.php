@@ -12,7 +12,7 @@ class Instinct {
     private static $content_wrap = true;
 
     static function inject($handle, $id = false, $content = "") {
-        if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
+        if (self::$inhibit)
             return $content;
 
         global $post;
@@ -25,7 +25,7 @@ class Instinct {
     }
 
     static function inject_parent($handle, $id = false, $content = "") {
-        if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
+        if (self::$inhibit)
             return $content;
 
         global $post;
@@ -38,8 +38,8 @@ class Instinct {
     }
 
     static function inject_adjacent($handle, $id = false) {
-        if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
-            return;
+        if (self::$inhibit)
+            return $content;
 
         global $post;
 
@@ -51,8 +51,7 @@ class Instinct {
     }
 
     static function compile($content) {
-        if (!is_user_logged_in())
-            return $content;
+
         $doc = phpQuery::newDocument($content);
 
         foreach (pq("body *") as $el) {
@@ -128,29 +127,29 @@ class Instinct {
     public static function write_ajax_url() {
         ?>
         <script type="text/javascript">
-                
+                                                
             var _INSTINCT_AJAX_URL = "<?php echo(INSTINCT_AJAX_URL); ?>";
-            
+                                            
             jQuery(document).ready(function(){
                 var instinct = angular.element("body").scope();
-                                                                                                    
+                                                                                                                                    
                 jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(e){
                     e.preventDefault();
                     if(instinct.edit_mode)
                         jQuery("span.instinct-adminbar-label",this).html("Quick Edit");
                     else
                         jQuery("span.instinct-adminbar-label",this).html("Stop Editing");
-                                                                                                    
+                                                                                                                                    
                     instinct.toggle_edit_mode();
                 });
-                
-                
-                
+                                                
+                                                
+                                                
             });
-        
-            
-                                                                                                    
-                                                                                                    
+                                        
+                                            
+                                                                                                                                    
+                                                                                                                                    
         </script>
         <?php
     }
@@ -167,8 +166,17 @@ class Instinct {
                 }, 0); // Start of WP_Footer action, inhibit
     }
 
-    public function hatch_register($name, $settings = array()) {
-        self::$hatches[$name] = $settings;
+    public function hatch_register($name, $fn, $settings = array()) {
+
+        require_once($fn);
+
+        if (is_array($name)) {
+            foreach ($name as $N) {
+                self::$hatches[$N]= $settings;
+            }
+        }
+        else
+            self::$hatches[$name] = $settings;
     }
 
     public static function add_toolbar_items($admin_bar) {
@@ -184,6 +192,12 @@ class Instinct {
         }
     }
 
+    public static function hatch_runhooks() {
+        foreach (self::$hatches as $name => $settings) {
+            $name::hook();
+        }
+    }
+
     public static function interface_chrome() {
         ?>
         <style type="text/css">
@@ -191,7 +205,7 @@ class Instinct {
             {
                 display: none;
                 overflow: hidden;
-                
+
             }
 
             iframe.instinct-interface.instinct-interface-fullscreen
@@ -287,9 +301,9 @@ class Instinct {
         </iframe>
         <div id="instinct-loader">
             <div id="instinct-load-message">
-                <img src="<?php echo(plugins_url("img/logo-white.png",INSTINCT_FILE)); ?>" alt="Instinct" /><br /><br />
+                <img src="<?php echo(plugins_url("img/logo-white.png", INSTINCT_FILE)); ?>" alt="Instinct" /><br /><br />
                 Please Wait<br />
-                
+
             </div>
         </div>
 
@@ -300,27 +314,28 @@ class Instinct {
         ?><script type="text/javascript">
                     function stoperror(e)
                     {
-                       
+                                                       
                         return true;
                     }
                     window.onerror=stoperror;
         </script>
         <?php
     }
-    
-    public static function is_active()
-    {
-        return is_user_loggedin() && !is_admin() && !is_login_page() && current_user_can("edit-posts");
+
+    public static function is_active() {
+
+        return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in();
     }
 
 }
 
 add_action("init", function() {
+
             if (Instinct::is_active()) {
 
                 Instinct::auto_inhibition();
                 InstinctAjax::init();
-
+                Instinct::hatch_runhooks();
                 // Parser Hooks
 
 
@@ -347,11 +362,11 @@ add_action("init", function() {
                             if (get_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro", true) == "") {
                                 wp_enqueue_style('wp-pointer');
                                 wp_enqueue_script('wp-pointer');
-                                
+
                                 wp_enqueue_script("instinct-tooltips", plugins_url("js/instinct-tooltips.js", INSTINCT_FILE), array("jquery", "wp-pointer"));
                                 add_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro", "1");
                             }
-                            
+
                             wp_enqueue_script('jquery-fonts', plugins_url("js/jquery.fonts.js", INSTINCT_FILE), array("jquery"));
                             wp_enqueue_script("jquery-ui-core");
                             wp_enqueue_script("angularjs", "https://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js", array("jquery"));
@@ -363,30 +378,41 @@ add_action("init", function() {
 
                             Instinct::write_ajax_url();
                         });
-                        
-                        
+
+
 
                 add_action('admin_bar_menu', array('Instinct', 'add_toolbar_items'), 70);
+
+                
             }
         });
 
-add_action("setup_theme", function() {
-            if (is_user_logged_in()) {
-                add_filter("theme_root", function($dir) {
-                            global $wp;
-                            //var_dump($wp);
-                            //die;
-
-                            if (isset($_REQUEST['ia']) || array_key_exists("instinctajax", $wp->query_vars))
-                                return plugins_url("template/", INSTINCT_FILE);
-                            else
-                                return $dir;
-                        }, 999);
-            }
-        });
 
 
 
 register_deactivation_hook(INSTINCT_FILE, function() {
             delete_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro");
         });
+
+if (!function_exists("is_login_page")) {
+
+    function is_login_page() {
+        return in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'));
+    }
+
+}
+
+add_action("setup_theme", function() {
+                            
+                                add_filter("theme_root", function($dir) {
+                                            global $wp;
+                                            //var_dump($wp);
+                                            //die;
+
+                                            if (isset($_REQUEST['ia']) || (is_array($wp->query_vars) && array_key_exists("instinctajax", $wp->query_vars)))
+                                                return plugins_url("template/", INSTINCT_FILE);
+                                            else
+                                                return $dir;
+                                        }, 999);
+                            
+                        });

@@ -9,7 +9,7 @@ class InstinctHatch {
     public $id = false;
     public $hint = false;
     public $allow_content_wrapping = true; // Set to false to exclude hatch from automatic content wrapping if enabled system-wide 
-    public static $title = "";
+    public $title = "";
     public $imode = INSTINCT_IMODE_UI;
     
     static function exists($hatch_name)
@@ -28,7 +28,6 @@ class InstinctHatch {
     
     function __construct($id) {
         $this->id = $id;
-        $this->_tag();
     }
 
     function _tag($content = "") {
@@ -78,9 +77,14 @@ class InstinctHatch {
         return new InstinctResponse("", INSTINCT_STATUS_OK);
     }
     
-    public static function render_interface($id)
+    public function render_interface($id)
     {
         return "";
+    }
+    
+    public static function hook()
+    {
+        
     }
 
 }

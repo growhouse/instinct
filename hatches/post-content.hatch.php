@@ -3,7 +3,7 @@
 class InstinctHatchPostContent extends InstinctHatch {
 
     public $hint = "Edit this post";
-    public static $title = "Edit post";
+    public $title = "Edit post";
 
     public function edit() {
         return new InstinctResponse(ob_get_clean(), INSTINCT_STATUS_OK);
@@ -32,7 +32,7 @@ class InstinctHatchPostContent extends InstinctHatch {
         return new InstinctResponse($data, INSTINCT_STATUS_OK);
     }
 
-    public static function render_interface($id) {
+    public function render_interface($id) {
         ob_start();
         ?>
         <script type="text/javascript">
@@ -81,11 +81,17 @@ class InstinctHatchPostContent extends InstinctHatch {
         return ob_get_clean();
     }
 
+    public static function hook()
+    {
+        add_filter("the_content", function($content) {
+           
+            $p = get_post();
+            if ($p->post_type == "post" || $p->post_type == "page")
+                return Instinct::inject("InstinctHatchPostContent", $post->id, $content);
+            return $content;
+        }, 9999); 
+
+    }
+    
 }
 
-add_filter("the_content", function($content, $id) {
-            $p = get_post($id);
-            if ($p->post_type == "post" || $p->post_type == "page")
-                return Instinct::inject("InstinctHatchPostContent", $id, $content);
-            return $content;
-        }, 9999, 2); 
