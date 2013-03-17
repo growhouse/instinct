@@ -47,6 +47,11 @@ class InstinctHatchSiteName extends InstinctHatch {
             
         }, 9999);
     }
+    
+    public function is_allowed()
+    {
+        return current_user_can("manage_options");
+    }
 }
 
 
@@ -96,6 +101,11 @@ class InstinctHatchSiteDescription extends InstinctHatch {
             return Instinct::inject_parent("InstinctHatchSiteDescription", false). $val;
             
         }, 9999);
+    }
+    
+    public function is_allowed()
+    {
+        return current_user_can("manage_options");
     }
 }
 

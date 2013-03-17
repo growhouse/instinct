@@ -93,5 +93,43 @@ class InstinctHatchPostContent extends InstinctHatch {
 
     }
     
+    public function is_allowed() {
+        //$u = new WP_User(get_current_user_id());
+        //var_dump($u->allcaps);
+        $p = get_post($this->id);
+        // echo($p->post_status);
+        if ($p->post_type == "post") {
+            if ($p->post_author == get_current_user_id()) {
+                if ($p->post_status == "publish")
+                    return current_user_can("edit_published_posts");
+                else
+                    return current_user_can("edit_posts");
+            }
+            else {
+                if ($p->post_status == "publish")
+                    return current_user_can("edit_published_posts") && current_user_can("edit_others_posts");
+                else
+                    return current_user_can("edit_others_posts");
+            }
+        }
+
+        if ($p->post_type == "page") {
+            if ($p->post_author == get_current_user_id()) {
+                if ($p->post_status == "publish")
+                    return current_user_can("edit_published_pages");
+                else
+                    return current_user_can("edit_pages");
+            }
+            else {
+                if ($p->post_status == "publish")
+                    return current_user_can("edit_published_pages") && current_user_can("edit_others_pages");
+                else
+                    return current_user_can("edit_others_pages");
+            }
+        }
+    }
+    
+ 
+    
 }
 

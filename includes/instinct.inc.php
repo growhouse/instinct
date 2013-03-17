@@ -1,6 +1,6 @@
 <?php
-define("INSTINCT_SIG_OPEN", "%!%");
-define("INSTINCT_SIG_CLOSE", "%!%");
+define("INSTINCT_SIG_OPEN", "%!%!");
+define("INSTINCT_SIG_CLOSE", "%!%!");
 
 define("INSTINCT_DEBUG_PARTCOMPILE", false);
 
@@ -54,7 +54,6 @@ class Instinct {
     }
 
     static function compile($content) {
-
         $doc = phpQuery::newDocument($content);
 
         foreach (pq("body *") as $el) {
@@ -75,8 +74,6 @@ class Instinct {
         }
 
         $doc = phpQuery::newDocument($doc);
-
-
 
         // Wrappables
 
@@ -327,7 +324,7 @@ class Instinct {
 
     public static function is_active() {
 
-        return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in() && current_user_can("edit_pages");
+        return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in() && current_user_can("edit_posts");
     }
 
 }
