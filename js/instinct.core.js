@@ -42,6 +42,7 @@ _instinct.
                
                     jQuery(".instinct-hinter").stop(true,true).fadeOut();
                 });
+                
             
                 elm.bind("click", function(e){
                     if(!scope.edit_mode)
@@ -98,6 +99,8 @@ _instinct.
                 });
       
       
+                
+      
                 $rootScope.$on('instinct-hatch-update', function(event, d) {
                     if(d.ele == elm)
                     {
@@ -148,6 +151,13 @@ _instinct.
                     jQuery("iframe.instinct-interface").css({
                         display: "none"
                     });
+                    
+                    var loader = jQuery("#instinct-loader");
+                    
+                    loader.fadeOut(300, function(){
+                            loader.css({display: "none"});
+                        });
+                    
                 });
             
                 $rootScope.$on('instinct-hinter-refresh', function(event, data) {
