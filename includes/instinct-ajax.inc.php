@@ -28,6 +28,11 @@ class InstinctAjax {
 
         $hatch = new $data['ih']($data['ii']); // Messy code - $data['ih'] assumed safe to instanciate after self::validate_request()
 
+        if(!$hatch->is_allowed())
+        {
+            return new InstinctResponse("Access denied", INSTINCT_STATUS_NOTAUTH, $hatch->imode, $hatch->title);
+        }
+            
         switch ($data['ia']) {
             case "interface":
             default:

@@ -12,41 +12,44 @@ class Instinct {
     private static $content_wrap = true;
 
     static function inject($handle, $id = false, $content = "") {
-        if (self::$inhibit)
-            return $content;
-
         global $post;
 
         if (!$id)
             $id = $post->ID;
 
         $hatch = new $handle($id);
+
+        if (self::$inhibit || !$hatch->is_allowed())
+            return $content;
+
         return INSTINCT_SIG_OPEN . urlencode($hatch->_tag($content)) . INSTINCT_SIG_CLOSE;
     }
 
     static function inject_parent($handle, $id = false, $content = "") {
-        if (self::$inhibit)
-            return $content;
-
         global $post;
 
         if (!$id)
             $id = $post->ID;
 
         $hatch = new $handle($id);
+
+        if (self::$inhibit || !$hatch->is_allowed())
+            return $content;
+
         return INSTINCT_SIG_OPEN . urlencode($hatch->_tag_parent($content)) . INSTINCT_SIG_CLOSE;
     }
 
     static function inject_adjacent($handle, $id = false) {
-        if (self::$inhibit)
-            return $content;
-
         global $post;
 
         if (!$id)
             $id = $post->ID;
 
         $hatch = new $handle($id);
+
+        if (self::$inhibit || !$hatch->is_allowed())
+            return $content;
+        
         return INSTINCT_SIG_OPEN . urlencode($hatch->_tag_adjacent($content)) . INSTINCT_SIG_CLOSE;
     }
 
@@ -127,29 +130,29 @@ class Instinct {
     public static function write_ajax_url() {
         ?>
         <script type="text/javascript">
-                                                
+                                                                
             var _INSTINCT_AJAX_URL = "<?php echo(INSTINCT_AJAX_URL); ?>";
-                                            
+                                                            
             jQuery(document).ready(function(){
                 var instinct = angular.element("body").scope();
-                                                                                                                                    
+                                                                                                                                                    
                 jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(e){
                     e.preventDefault();
                     if(instinct.edit_mode)
                         jQuery("span.instinct-adminbar-label",this).html("Quick Edit");
                     else
                         jQuery("span.instinct-adminbar-label",this).html("Stop Editing");
-                                                                                                                                    
+                                                                                                                                                    
                     instinct.toggle_edit_mode();
                 });
-                                                
-                                                
-                                                
+                                                                
+                                                                
+                                                                
             });
-                                        
-                                            
-                                                                                                                                    
-                                                                                                                                    
+                                                        
+                                                            
+                                                                                                                                                    
+                                                                                                                                                    
         </script>
         <?php
     }
@@ -172,7 +175,7 @@ class Instinct {
 
         if (is_array($name)) {
             foreach ($name as $N) {
-                self::$hatches[$N]= $settings;
+                self::$hatches[$N] = $settings;
             }
         }
         else
@@ -314,7 +317,7 @@ class Instinct {
         ?><script type="text/javascript">
                     function stoperror(e)
                     {
-                                                       
+                                                                       
                         return true;
                     }
                     window.onerror=stoperror;
@@ -382,8 +385,6 @@ add_action("init", function() {
 
 
                 add_action('admin_bar_menu', array('Instinct', 'add_toolbar_items'), 70);
-
-                
             }
         });
 
@@ -403,16 +404,15 @@ if (!function_exists("is_login_page")) {
 }
 
 add_action("setup_theme", function() {
-                            
-                                add_filter("theme_root", function($dir) {
-                                            global $wp;
-                                            //var_dump($wp);
-                                            //die;
 
-                                            if (isset($_REQUEST['ia']) || (is_array($wp->query_vars) && array_key_exists("instinctajax", $wp->query_vars)))
-                                                return plugins_url("template/", INSTINCT_FILE);
-                                            else
-                                                return $dir;
-                                        }, 999);
-                            
-                        });
+            add_filter("theme_root", function($dir) {
+                        global $wp;
+                        //var_dump($wp);
+                        //die;
+
+                        if (isset($_REQUEST['ia']) || (is_array($wp->query_vars) && array_key_exists("instinctajax", $wp->query_vars)))
+                            return plugins_url("template/", INSTINCT_FILE);
+                        else
+                            return $dir;
+                    }, 999);
+        });
