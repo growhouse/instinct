@@ -15,6 +15,24 @@ _instinct.
       
                 var iifdom = document.getElementById("instinct-interface");
       
+                function isFixedPos(elm)
+                {
+                    if(elm.css("position") == "fixed")
+                        return true;
+                    
+                    var ret = false;
+                    
+                    var walker = function(){
+                        if(jQuery(this).css("position") == "fixed")
+                            ret = true;
+                        jQuery(this).parents().first().each(walker);
+                    };
+                    
+                    elm.parents().first().each(walker);
+                    
+                    return ret;
+                }
+      
                 elm.bind("mouseover", function(){
                     if(!scope.edit_mode)
                         return;
@@ -92,6 +110,16 @@ _instinct.
                         
                     });
                     
+                    if(isFixedPos(elm))
+                    {
+                        
+                        interf.css({
+                            position: "fixed",
+                            top: (eleoffset.top - jQuery(document).scrollTop()),
+                            left: (eleoffset.left - jQuery(document).scrollLeft())
+                            
+                        });
+                    }
                 
                                 
                     // console.log(data);
@@ -155,8 +183,10 @@ _instinct.
                     var loader = jQuery("#instinct-loader");
                     
                     loader.fadeOut(300, function(){
-                            loader.css({display: "none"});
+                        loader.css({
+                            display: "none"
                         });
+                    });
                     
                 });
             
