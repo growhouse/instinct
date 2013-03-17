@@ -76,7 +76,7 @@ _instinct.
                     eleoffset.left += parseInt(jQuery(this).css("padding-left"));
                     eleoffset.left += parseInt(jQuery(this).css("border-left-width"));
                     
-                    interf.attr("src", "/instinctajax/?ia=interface&ih="+data.hatch+"&ii="+data.id);
+                    interf.attr("src", _INSTINCT_AJAX_URL+"ia=interface&ih="+data.hatch+"&ii="+data.id);
                     
                     
                     interf.css("z-index", elm.zIndex() + 1);

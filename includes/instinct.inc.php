@@ -125,10 +125,19 @@ class Instinct {
     }
 
     public static function write_ajax_url() {
+        global $wp_rewrite;
+        if($wp_rewrite->using_permalinks())
+        {
+            $ajax_url = INSTINCT_AJAX_URL."?";
+        }
+        else
+        {
+            $ajax_url = "?instinctajax=1&";
+        }
         ?>
         <script type="text/javascript">
                                                                 
-            var _INSTINCT_AJAX_URL = "<?php echo(INSTINCT_AJAX_URL); ?>";
+            var _INSTINCT_AJAX_URL = "<?php echo($ajax_url); ?>";
                                                             
             jQuery(document).ready(function(){
                 var instinct = angular.element("body").scope();
