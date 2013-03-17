@@ -324,7 +324,7 @@ class Instinct {
 
     public static function is_active() {
 
-        return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in();
+        return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in() && current_user_can("edit_pages");
     }
 
 }
