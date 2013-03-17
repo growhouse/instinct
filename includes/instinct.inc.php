@@ -335,6 +335,12 @@ class Instinct {
 
         return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in() && current_user_can("edit_posts");
     }
+    
+    public static function set_autowrap($set)
+    {
+        self::$content_wrap = (bool) $set;
+        
+    }
 
 }
 
@@ -345,6 +351,7 @@ add_action("init", function() {
                 Instinct::auto_inhibition();
                 InstinctAjax::init();
                 Instinct::hatch_runhooks();
+                Instinct::set_autowrap(get_option("instinct-autowrap", 1));
                 // Parser Hooks
 
 
