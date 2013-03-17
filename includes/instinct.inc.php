@@ -307,11 +307,16 @@ class Instinct {
         </script>
         <?php
     }
+    
+    public static function is_active()
+    {
+        return is_user_loggedin() && !is_admin() && !is_login_page() && current_user_can("edit-posts");
+    }
 
 }
 
 add_action("init", function() {
-            if (is_user_logged_in() && !is_admin() && !is_login_page()) {
+            if (Instinct::is_active()) {
 
                 Instinct::auto_inhibition();
                 InstinctAjax::init();
