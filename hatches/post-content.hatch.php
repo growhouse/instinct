@@ -16,7 +16,17 @@ class InstinctHatchPostContent extends InstinctHatch {
         if ($post->post_type == "post" || $post->post_type == "page") {
             $post->post_content = $data;
             wp_update_post($post);
-            return new InstinctResponse($data, INSTINCT_STATUS_OK);
+            
+            $postLoop = new WP_Query("p=".$id);
+            
+            if($postLoop->have_posts())
+            {
+                $postLoop->the_post();
+                return new InstinctResponse(apply_filters('the_content',get_the_content()), INSTINCT_STATUS_OK);
+            }
+            
+            return new InstinctResponse("Post not found", INSTINCT_STATUS_SERVERERROR);
+            
         }
 
         return new InstinctResponse($data, INSTINCT_STATUS_OK);
@@ -78,4 +88,4 @@ add_filter("the_content", function($content, $id) {
             if ($p->post_type == "post" || $p->post_type == "page")
                 return Instinct::inject("InstinctHatchPostContent", $id, $content);
             return $content;
-        }, 9999, 2);
+        }, 9999, 2); 
