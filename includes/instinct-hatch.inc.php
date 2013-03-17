@@ -86,5 +86,10 @@ class InstinctHatch {
     {
         
     }
+    
+    public function is_allowed()
+    {
+        return false;
+    }
 
 }
