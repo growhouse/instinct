@@ -23,7 +23,7 @@ class InstinctAjax {
 
         if (!self::validate_request($data))
             return new InstinctResponse("Invalid Request", INSTINCT_STATUS_VALIDATIONERROR);
-        
+
         Instinct::$inhibit = true;
 
         $hatch = new $data['ih'](); // Messy code - $data['ih'] assumed safe to instanciate after self::validate_request()
@@ -46,26 +46,26 @@ class InstinctAjax {
         $input = json_decode($input);
 
         if (array_key_exists("instinctajax", $data->query_vars)) {
-            
+
             add_filter('show_admin_bar', '__return_false');
-            
-            
-            
+
+
+
             if ($input !== null)
                 die(self::router((array) $input)->compose());
             else
                 die(self::router($data->query_vars)->compose());
-            
         }
     }
 
     public static function init() {
+        if (Instinct::is_active()) {
+            add_filter('rewrite_rules_array', array("InstinctAjax", "insert_rewrite_rules"));
+            add_filter('query_vars', array("InstinctAjax", "insert_query_vars"));
+            add_action('wp_loaded', array("InstinctAjax", "flush_rules"));
 
-        add_filter('rewrite_rules_array', array("InstinctAjax", "insert_rewrite_rules"));
-        add_filter('query_vars', array("InstinctAjax", "insert_query_vars"));
-        add_action('wp_loaded', array("InstinctAjax", "flush_rules"));
-
-        add_action('parse_request', array("InstinctAjax", "run"));
+            add_action('parse_request', array("InstinctAjax", "run"));
+        }
     }
 
     // flush_rules() if our rules are not yet included
