@@ -6,7 +6,8 @@
   Description: Instinct is an intelligent on-page editor plugin for Wordpress 3.5. Instinct automatically integrates with most themes to assist in a simple plug 'n' play installation. It's extendable too, so plugin developers can add on-page editor functionality easily to complement their core features.
   Author: Tom Lawton
   Version: 0.1
-  Author URI:
+  Author URI: 
+  License: GPL2
  */
 
 define("INSTINCT_ROOT", dirname(__FILE__));
@@ -20,6 +21,7 @@ require_once("includes/instinct-response.inc.php");
 require_once("includes/instinct-hatch.inc.php");
 require_once("includes/instinct-hinter.inc.php");
 require_once("includes/instinct-ajax.inc.php");
+require_once("includes/instinct-admin.inc.php");
 
 require_once("includes/hatch-suite.inc.php");
 

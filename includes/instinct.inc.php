@@ -9,7 +9,7 @@ class Instinct {
     public static $inhibit = false;
     private static $hatches = array();
     private static $interface_markup = "";
-    private static $content_wrap = false;
+    private static $content_wrap = true;
 
     static function inject($handle, $id = false, $content = "") {
         if (is_login_page() || is_admin() || !is_user_logged_in() || self::$inhibit)
@@ -128,22 +128,29 @@ class Instinct {
     public static function write_ajax_url() {
         ?>
         <script type="text/javascript">
+                
             var _INSTINCT_AJAX_URL = "<?php echo(INSTINCT_AJAX_URL); ?>";
+            
             jQuery(document).ready(function(){
                 var instinct = angular.element("body").scope();
-                                                                                    
+                                                                                                    
                 jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(e){
                     e.preventDefault();
                     if(instinct.edit_mode)
                         jQuery("span.instinct-adminbar-label",this).html("Quick Edit");
                     else
                         jQuery("span.instinct-adminbar-label",this).html("Stop Editing");
-                                                                                    
+                                                                                                    
                     instinct.toggle_edit_mode();
                 });
+                
+                
+                
             });
-                                                                                    
-                                                                                    
+        
+            
+                                                                                                    
+                                                                                                    
         </script>
         <?php
     }
@@ -184,7 +191,19 @@ class Instinct {
             {
                 display: none;
                 overflow: hidden;
-                z-index: 99998;
+                
+            }
+
+            iframe.instinct-interface.instinct-interface-fullscreen
+            {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                z-index: 99998 !important;
             }
 
             .instinct-hidden
@@ -243,20 +262,23 @@ class Instinct {
             }
             #instinct-load-message
             {
-                
+
                 display: table-cell;
                 vertical-align: middle; 
                 text-align: center; 
                 font-family: sans-serif;
-                font-size: 34px;
+                font-size: 42px;
+
+                text-shadow: 0px -1px 0px #333;
+
             }
-            
+
             #instinct-load-message small
             {
                 color: #fff;
-                font-size: 12px;
+                font-size: 13px;
                 text-transform: uppercase;
-                font-weight: bold;
+
             }
 
         </style>
@@ -265,11 +287,24 @@ class Instinct {
         </iframe>
         <div id="instinct-loader">
             <div id="instinct-load-message">
+                <img src="<?php echo(plugins_url("img/logo-white.png",INSTINCT_FILE)); ?>" alt="Instinct" /><br /><br />
                 Please Wait<br />
-                <small>Loading on-page editor</small>
+                
             </div>
         </div>
 
+        <?php
+    }
+
+    public static function ignore_js_errors() {
+        ?><script type="text/javascript">
+                    function stoperror(e)
+                    {
+                       
+                        return true;
+                    }
+                    window.onerror=stoperror;
+        </script>
         <?php
     }
 
@@ -307,18 +342,24 @@ add_action("init", function() {
                             if (get_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro", true) == "") {
                                 wp_enqueue_style('wp-pointer');
                                 wp_enqueue_script('wp-pointer');
+                                
                                 wp_enqueue_script("instinct-tooltips", plugins_url("js/instinct-tooltips.js", INSTINCT_FILE), array("jquery", "wp-pointer"));
                                 add_user_meta(get_current_user_id(), "instinct-tooltip-editmodeintro", "1");
                             }
+                            
+                            wp_enqueue_script('jquery-fonts', plugins_url("js/jquery.fonts.js", INSTINCT_FILE), array("jquery"));
+                            wp_enqueue_script("jquery-ui-core");
                             wp_enqueue_script("angularjs", "https://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js", array("jquery"));
                             wp_enqueue_script("jquery-animateshadow", plugins_url("js/jquery.animate-shadow-min.js", INSTINCT_FILE), array("jquery"));
-                            wp_enqueue_script("instinct-core", plugins_url("js/instinct.core.js", INSTINCT_FILE), array("angularjs", "jquery-animateshadow"));
+                            wp_enqueue_script("instinct-core", plugins_url("js/instinct.core.js", INSTINCT_FILE), array("angularjs", "jquery-animateshadow", "jquery-ui-core"));
                         });
 
                 add_action("wp_head", function() {
 
                             Instinct::write_ajax_url();
                         });
+                        
+                        
 
                 add_action('admin_bar_menu', array('Instinct', 'add_toolbar_items'), 70);
             }

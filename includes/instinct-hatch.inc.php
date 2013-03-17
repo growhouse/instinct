@@ -1,11 +1,16 @@
 <?php
 
+define("INSTINCT_IMODE_JSON", "json");
+define("INSTINCT_IMODE_UI", "iframe");
+define("INSTINCT_IMODE_CHAMELEON", "chameleon");
+
 class InstinctHatch {
 
     public $id = false;
     public $hint = false;
     public $allow_content_wrapping = true; // Set to false to exclude hatch from automatic content wrapping if enabled system-wide 
     public static $title = "";
+    public $imode = INSTINCT_IMODE_UI;
     
     static function exists($hatch_name)
     {
@@ -52,6 +57,7 @@ class InstinctHatch {
             "hatch" => get_class($this),
             "id" => $this->id,
             "hint" => $this->hint,
+            "imode" => $this->imode,
         );
         return json_encode((object) $data);
     }

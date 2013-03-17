@@ -10,6 +10,7 @@ class InstinctHatchSiteName extends InstinctHatch {
     
     public static $title = "Site Name";
     public $hint = "Edit site name";
+    public $imode = INSTINCT_IMODE_CHAMELEON;
     
     public function save($id, $data) {
 
@@ -34,7 +35,7 @@ class InstinctHatchSiteName extends InstinctHatch {
             });
         </script>
         <form>
-            <input name="title" value="<?php echo(get_option("blogname")); ?>" style="width: 490px;" />
+            <input name="title" id="instinct-chameleon" value="<?php echo(get_option("blogname")); ?>" style="width: 490px;" />
             <a href="#" id="instinct-save" class="button button-primary">Save</a>
             <a href="#" id="instinct-close" class="button">Close</a>
         </form>
@@ -54,6 +55,7 @@ class InstinctHatchSiteDescription extends InstinctHatch {
     
     public static $title = "Site Description";
     public $hint = "Edit site description";
+    public $imode = INSTINCT_IMODE_CHAMELEON;
     public function save($id, $data) {
 
         update_option("blogdescription", $data);
@@ -77,7 +79,7 @@ class InstinctHatchSiteDescription extends InstinctHatch {
             });
         </script>
         <form>
-            <input name="title" value="<?php echo(get_option("blogdescription")); ?>" style="width: 490px;" />
+            <input name="title" id="instinct-chameleon" value="<?php echo(get_option("blogdescription")); ?>" style="width: 490px;" />
             <a href="#" id="instinct-save" class="button button-primary">Save</a>
             <a href="#" id="instinct-close" class="button">Close</a>
         </form>

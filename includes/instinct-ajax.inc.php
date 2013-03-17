@@ -31,7 +31,7 @@ class InstinctAjax {
         switch ($data['ia']) {
             case "interface":
             default:
-                return new InstinctResponse($data['ih']::render_interface($data['ii']), INSTINCT_STATUS_OK, "iframe", $data['ih']::$title);
+                return new InstinctResponse($data['ih']::render_interface($data['ii']), INSTINCT_STATUS_OK, $hatch->imode, $data['ih']::$title);
                 break;
             case "save":
                 return $hatch->save($data['ii'], $data['id']);

@@ -13,6 +13,8 @@ _instinct.
                 var data = eval("("+attrs.instinctHatch+")");
                 //console.log(attrs);
       
+                var iifdom = document.getElementById("instinct-interface");
+      
                 elm.bind("mouseover", function(){
                     if(!scope.edit_mode)
                         return;
@@ -51,11 +53,15 @@ _instinct.
                         height: jQuery(".instinct-hidden").data("orig-height")
                     });
                     jQuery(".instinct-hidden").removeClass("instinct-hidden");
-                    jQuery(this).addClass("instinct-hidden");
-                
+                    
+                    if(data.imode != "chameleon")
+                        jQuery(this).addClass("instinct-hidden");
+                                   
                     jQuery(this).data("orig-height", jQuery(this).css("height"));
                     
-                    jQuery("#instinct-loader").css({display: "table"});
+                    jQuery("#instinct-loader").css({
+                        display: "table"
+                    });
                     jQuery("#instinct-loader").fadeIn();
                     interf.css({
                         display: "none",
@@ -70,6 +76,11 @@ _instinct.
                     eleoffset.left += parseInt(jQuery(this).css("border-left-width"));
                     
                     interf.attr("src", "/instinctajax/?ia=interface&ih="+data.hatch+"&ii="+data.id);
+                    
+                    
+                    interf.css("z-index", elm.zIndex() + 1);
+                    
+                    
                     interf.css({
                         position: "absolute",
                         top: eleoffset.top,
@@ -77,7 +88,9 @@ _instinct.
                         height: jQuery(this).height(),
                         width: jQuery(this).width(),
                         display: "block"
+                        
                     });
+                    
                 
                                 
                     // console.log(data);
@@ -85,10 +98,10 @@ _instinct.
                 });
       
       
-                $rootScope.$on('instinct-hatch-update', function(event, data) {
-                    if(data.ele == elm)
+                $rootScope.$on('instinct-hatch-update', function(event, d) {
+                    if(d.ele == elm)
                     {
-                        data.ele.html(data.data);
+                        d.ele.html(d.data);
                         jQuery(".instinct-hidden").css({
                             height: "auto"
                         });
@@ -98,6 +111,16 @@ _instinct.
                         jQuery("iframe.instinct-interface").css({
                             display: "none"
                         });
+                        if(data.imode == "chameleon")
+                        {
+                            jQuery(".instinct-hinter").stop(true,true).fadeIn(100,function(){
+                                setTimeout(1000, function(){
+                                    jQuery(".instinct-hinter").stop(true,true).fadeOut();
+                                });
+                                
+                            });
+                            scope.hint("Changes saved");
+                        }
                     // console.log('received');
                     }
                     
@@ -106,10 +129,12 @@ _instinct.
                 $rootScope.$on('instinct-hatch-shadow', function(event, data) {
                     if(data.ele == elm)
                     {
-                        
-                        data.ele.css({
-                            height: data.height
-                        });
+                        if(data.imode != "chameleon")
+                        {
+                            data.ele.css({
+                                height: data.height
+                            });
+                        }
                         
                     }
                     
@@ -132,6 +157,27 @@ _instinct.
                         },1000)
                     });
                 });
+                
+                $rootScope.$on('instinct-hatch-fullscreen', function(event, data) {
+                    jQuery("iframe.instinct-interface").toggleClass("instinct-interface-fullscreen");
+                    var iframe = iifdom.contentWindow ? iifdom.contentWindow.document : iifdom.contentDocument
+                    iframe.tinymce.activeEditor.theme.resizeTo(500,500);
+                });
+                
+                $rootScope.$on('instinct-hatch-chameleon', function(event, data) {
+                    if(data.source == elm)
+                    {
+                        var iframe = iifdom.contentWindow ? iifdom.contentWindow.document : iifdom.contentDocument
+                        
+                        
+                                               
+                        //alert(data.imode);
+                        data.target.css("cssText", elm.css("cssText"));
+                        data.source.addClass("instinct-hidden");
+                       
+                    }
+                    
+                });
             }
         };
     });
@@ -148,8 +194,9 @@ function editableCtrl($scope, $http, $rootScope){
             $scope.hint_msg = msg;
         else
             $scope.hint_msg = '';
-            
-        $scope.$apply();
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
     }    
     
     $scope.is_active = function()
@@ -166,11 +213,11 @@ function editableCtrl($scope, $http, $rootScope){
         $scope.element = element;
         
         $rootScope.$broadcast('instinct-hatch-shadow', {
-            height: height,
+            height: $scope.element.height(),
             ele: $scope.element
         });
         
-        $scope.hint(hatch.hatch);
+    //$scope.hint(hatch.hint);
     }
     
     
@@ -194,8 +241,9 @@ function editableCtrl($scope, $http, $rootScope){
         })
         .
         error(function(data, status) {
-              
-            });
+            $scope.hint("Connection Lost. Please refresh and try again.");
+            $rootScope.$broadcast("instinct-hinter-refresh");
+        });
     };
     
     $scope.update_hatch_element = function(height)
@@ -231,5 +279,15 @@ function editableCtrl($scope, $http, $rootScope){
         
     };
     
+    $scope.toggle_fullscreen_hatch = function(){
+        $rootScope.$broadcast("instinct-hatch-fullscreen");
+    };
+    
+    $scope.chameleon = function(target){
+        $rootScope.$broadcast("instinct-hatch-chameleon", {
+            target: target, 
+            source: $scope.element
+        });
+    }
     
 };

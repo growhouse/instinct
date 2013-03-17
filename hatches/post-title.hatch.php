@@ -4,6 +4,7 @@ class InstinctHatchPostTitle extends InstinctHatch {
 
     public $hint = "Edit the title";
     public static $title = "Title";
+    public $imode = INSTINCT_IMODE_CHAMELEON;
 
     public function save($id, $data) {
 
@@ -35,7 +36,7 @@ class InstinctHatchPostTitle extends InstinctHatch {
             });
         </script>
         <form>
-            <input name="title" value="<?php echo($p->post_title); ?>" style="width: 330px;"/>
+            <input name="title" id="instinct-chameleon" value="<?php echo($p->post_title); ?>" style="width: 330px;"/>
             <a href="#" id="instinct-save" class="button button-primary">Save</a>
             <a href="#" id="instinct-close" class="button">Close</a>
         </form>

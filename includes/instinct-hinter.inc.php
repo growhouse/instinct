@@ -63,5 +63,6 @@ class InstinctHinter {
 }
 
 add_action("wp_footer", function() {
-            InstinctHinter::render();
+            if (is_user_logged_in() && !is_login_page())
+                InstinctHinter::render();
         });
