@@ -6,10 +6,14 @@ class InstinctHatchNavMenu extends InstinctHatch {
     
     public static function hook()
     {
-        add_filter("wp_nav_menu_items", function($menu, $args) {
-
+        add_filter("wp_nav_menu", function($menu) {
             return Instinct::inject_parent("InstinctHatchNavMenu", $args->theme_location) . $menu;
-        }, 999, 2);
+        });
+    }
+    
+     public function is_allowed()
+    {
+        return current_user_can("manage_options");
     }
 }
 
