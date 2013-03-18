@@ -3,6 +3,7 @@ define("INSTINCT_SIG_OPEN", "%!%!");
 define("INSTINCT_SIG_CLOSE", "%!%!");
 
 define("INSTINCT_DEBUG_PARTCOMPILE", false);
+define("INSTINCT_DEBUG_DONTCOMPILE", false);
 
 class Instinct {
 
@@ -49,11 +50,14 @@ class Instinct {
 
         if (self::$inhibit || !$hatch->is_allowed())
             return $content;
-        
+
         return INSTINCT_SIG_OPEN . urlencode($hatch->_tag_adjacent($content)) . INSTINCT_SIG_CLOSE;
     }
 
     static function compile($content) {
+        if (defined("INSTINCT_DEBUG_DONTCOMPILE") && INSTINCT_DEBUG_DONTCOMPILE)
+            return $content;
+
         $doc = phpQuery::newDocument($content);
 
         foreach (pq("body *") as $el) {
@@ -113,7 +117,11 @@ class Instinct {
         pq("body")->attr("ng-app", "instinct");
         pq("body")->attr("ng-controller", "editableCtrl");
 
-        // Finally, inject hatch interfaces
+        // Finally, run post-processed hatches
+
+        foreach (self::$hatches as $hatch => $settings) {
+            $hatch::post_process($doc);
+        }
 
         return $doc;
     }
@@ -126,39 +134,40 @@ class Instinct {
 
     public static function write_ajax_url() {
         global $wp_rewrite;
-        if($wp_rewrite->using_permalinks())
-        {
-            $ajax_url = INSTINCT_AJAX_URL."?";
-        }
-        else
-        {
+        if ($wp_rewrite->using_permalinks()) {
+            $ajax_url = INSTINCT_AJAX_URL . "?";
+        } else {
             $ajax_url = "?instinctajax=1&";
         }
         ?>
         <script type="text/javascript">
-                                                                
+                                                                        
             var _INSTINCT_AJAX_URL = "<?php echo($ajax_url); ?>";
-                                                            
+                                                                    
             jQuery(document).ready(function(){
                 var instinct = angular.element("body").scope();
-                                                                                                                                                    
+                                                                                                                                                            
                 jQuery("#wp-admin-bar-instinct-edit-mode").live("click",function(e){
                     e.preventDefault();
                     if(instinct.edit_mode)
                         jQuery("span.instinct-adminbar-label",this).html("Quick Edit");
                     else
                         jQuery("span.instinct-adminbar-label",this).html("Stop Editing");
-                                                                                                                                                    
+                                                                                                                                                            
                     instinct.toggle_edit_mode();
                 });
-                                                                
-                                                                
-                                                                
+                          
+                if(jQuery.browser.msie)
+                {
+                    alert("Instinct has not been tested on IE. Please use Chrome.")
+                }
+                                                                        
+                                                                        
             });
-                                                        
-                                                            
-                                                                                                                                                    
-                                                                                                                                                    
+                                                                
+                                                                    
+                                                                                                                                                            
+                                                                                                                                                            
         </script>
         <?php
     }
@@ -323,7 +332,7 @@ class Instinct {
         ?><script type="text/javascript">
                     function stoperror(e)
                     {
-                                                                       
+                                                                               
                         return true;
                     }
                     window.onerror=stoperror;
@@ -335,11 +344,9 @@ class Instinct {
 
         return !is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) && is_user_logged_in() && current_user_can("edit_posts");
     }
-    
-    public static function set_autowrap($set)
-    {
+
+    public static function set_autowrap($set) {
         self::$content_wrap = (bool) $set;
-        
     }
 
 }
@@ -350,14 +357,14 @@ add_action("init", function() {
 
                 Instinct::auto_inhibition();
                 InstinctAjax::init();
-                Instinct::hatch_runhooks();
+
                 Instinct::set_autowrap(get_option("instinct-autowrap", 1));
                 // Parser Hooks
 
 
 
                 add_action("wp", function() {
-
+                            Instinct::hatch_runhooks();
                             ob_start(array("Instinct", "compile"));
                         });
 
@@ -365,6 +372,7 @@ add_action("init", function() {
 
                             ob_end_flush();
                         });
+
 
 
                 add_action("wp_footer", array("Instinct", "interface_chrome"));
