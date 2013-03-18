@@ -11,6 +11,7 @@ class InstinctHatch {
     public $allow_content_wrapping = true; // Set to false to exclude hatch from automatic content wrapping if enabled system-wide 
     public $title = "";
     public $imode = INSTINCT_IMODE_UI;
+    public $merge = false;
     
     static function exists($hatch_name)
     {
@@ -95,6 +96,12 @@ class InstinctHatch {
     public static function post_process(&$doc)
     {
         return;
+    }
+    
+    public function content_original()
+    {
+        // should return original content (will be run before save) only if $merge is set.
+        return false;
     }
 
 }

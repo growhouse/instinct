@@ -10,12 +10,14 @@ class InstinctResponse {
     private $data_payload;
     private $output_type;
     private $interface_title;
+    private $orig_data = false;
 
-    function __construct($data, $status = INSTINCT_STATUS_OK, $output_type = "json", $title = "") {
+    function __construct($data, $status = INSTINCT_STATUS_OK, $output_type = "json", $title = "", $orig = false) {
         $this->data_payload = $data;
         $this->status = $status;
         $this->output_type = $output_type;
         $this->interface_title = $title;
+        $this->orig_data = $orig;
     }
 
     function compose() {
@@ -24,7 +26,8 @@ class InstinctResponse {
             default:
                 return json_encode(array(
                             'status' => $this->status,
-                            'data' => $this->data_payload
+                            'data' => $this->data_payload,
+                            'orig_data' => $this->orig_data
                         ));
                 break;
             case "iframe":

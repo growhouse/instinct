@@ -132,7 +132,15 @@ _instinct.
                 $rootScope.$on('instinct-hatch-update', function(event, d) {
                     if(d.ele == elm)
                     {
-                        d.ele.html(d.data);
+                        if(d.data.orig_data != false)
+                        {
+                                 // merge mode
+                                 
+                                 d.ele.html(d.ele.html().replace(d.data.orig_data, d.data.data));
+                        }
+                        else
+                            d.ele.html(d.data.data);
+                        
                         jQuery(".instinct-hidden").css({
                             height: "auto"
                         });
@@ -274,7 +282,7 @@ function editableCtrl($scope, $http, $rootScope){
         success(function(data, status) {
                         
             $rootScope.$broadcast('instinct-hatch-update', {
-                data: data.data, 
+                data: data, 
                 ele: $scope.element
             });
             
