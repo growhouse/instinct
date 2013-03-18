@@ -6,9 +6,7 @@ Instinct::hatch_register("InstinctHatchPostContent", INSTINCT_ROOT . "/hatches/p
 
 Instinct::hatch_register(array("InstinctHatchSiteName", "InstinctHatchSiteDescription"), INSTINCT_ROOT . "/hatches/site-settings.hatch.php");
 
-
-// require_once(INSTINCT_ROOT."/hatches/nav-menu.hatch.php");
-// Instinct::hatch_register("InstinctHatchNavMenu");
+//Instinct::hatch_register("InstinctHatchNavMenu", INSTINCT_ROOT."/hatches/nav-menu.hatch.php");
 
 
 
