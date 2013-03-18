@@ -37,9 +37,9 @@ class InstinctHatch {
             return $content;
     }
 
-    function _tag_parent() {
+    function _tag_parent($content = "") {
         if (!Instinct::$inhibit)
-            return "<instinct-parent x-instinct-hatch='" . $this->_data() . "'></instinct-parent>";
+            return "<instinct-parent x-instinct-hatch='" . $this->_data() . "'></instinct-parent>".$content;
         else
             return "";
     }
@@ -90,6 +90,11 @@ class InstinctHatch {
     public function is_allowed()
     {
         return false;
+    }
+    
+    public static function post_process(&$doc)
+    {
+        return;
     }
 
 }
