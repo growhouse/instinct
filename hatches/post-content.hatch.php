@@ -4,6 +4,7 @@ class InstinctHatchPostContent extends InstinctHatch {
 
     public $hint = "Edit this post";
     public $title = "Edit post";
+    public static $is_excerpt = false;
 
     public function edit() {
         return new InstinctResponse(ob_get_clean(), INSTINCT_STATUS_OK);
@@ -83,6 +84,11 @@ class InstinctHatchPostContent extends InstinctHatch {
 
     public static function filter($content)
     {
+        if(InstinctHatchPostContent::$is_excerpt)
+        {
+           return $content;
+        }
+           
         $p = get_post();
             if ($p->post_type == "post" || $p->post_type == "page")
                 return Instinct::inject("InstinctHatchPostContent", $post->id, $content);
@@ -93,12 +99,16 @@ class InstinctHatchPostContent extends InstinctHatch {
     
     public static function hook()
     {
+        
         add_filter("the_content", array("InstinctHatchPostContent","filter"), 9999); 
-        add_filter("get_the_excerpt", array("InstinctHatchPostContent","filter"), 9999); 
-        add_filter("get_the_excerpt", function(){
-            global $post;
-            return empty($post->post_excerpt) ? wp_trim_excerpt($post->post_content): $post->post_excerpt;
-        });
+        add_filter("get_the_excerpt", 
+                function() {
+                    InstinctHatchPostContent::$is_excerpt = true;
+                }, 0); 
+        //add_filter("get_the_excerpt", function(){
+        //    global $post;
+        //    return empty($post->post_excerpt) ? wp_trim_excerpt($post->post_content): $post->post_excerpt;
+        //},0);
 
     }
     
