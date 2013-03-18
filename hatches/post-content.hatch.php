@@ -81,15 +81,24 @@ class InstinctHatchPostContent extends InstinctHatch {
         return ob_get_clean();
     }
 
-    public static function hook()
+    public static function filter($content)
     {
-        add_filter("the_content", function($content) {
-           
-            $p = get_post();
+        $p = get_post();
             if ($p->post_type == "post" || $p->post_type == "page")
                 return Instinct::inject("InstinctHatchPostContent", $post->id, $content);
             return $content;
-        }, 9999); 
+    }
+    
+   
+    
+    public static function hook()
+    {
+        add_filter("the_content", array("InstinctHatchPostContent","filter"), 9999); 
+        add_filter("get_the_excerpt", array("InstinctHatchPostContent","filter"), 9999); 
+        add_filter("get_the_excerpt", function(){
+            global $post;
+            return empty($post->post_excerpt) ? wp_trim_excerpt($post->post_content): $post->post_excerpt;
+        });
 
     }
     
