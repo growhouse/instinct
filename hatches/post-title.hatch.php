@@ -5,6 +5,7 @@ class InstinctHatchPostTitle extends InstinctHatch {
     public $hint = "Edit the title";
     public $title = "Title";
     public $imode = INSTINCT_IMODE_CHAMELEON;
+    public $merge = true;
 
     public function save($id, $data) {
 
@@ -12,13 +13,21 @@ class InstinctHatchPostTitle extends InstinctHatch {
 
         if ($post->post_type == "post" || $post->post_type == "page") {
             $post->post_title = $data;
+            $orig = $this->content_original();
             wp_update_post($post);
-            return new InstinctResponse($data, INSTINCT_STATUS_OK);
+            return new InstinctResponse($data, INSTINCT_STATUS_OK, INSTINCT_IMODE_JSON, "", $orig);
         }
 
         return new InstinctResponse($data, INSTINCT_STATUS_OK);
     }
 
+    public function content_original()
+    {
+        $post = get_post($this->id);
+        return $post->post_title;
+      
+    }
+    
     public function render_interface($id) {
         $p = get_post($id);
         ob_start();

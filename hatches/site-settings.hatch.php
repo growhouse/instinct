@@ -7,11 +7,19 @@ class InstinctHatchSiteName extends InstinctHatch {
     public $title = "Site Name";
     public $hint = "Edit site name";
     public $imode = INSTINCT_IMODE_CHAMELEON;
+    public $merge = true;
     
     public function save($id, $data) {
-
+        $orig = $this->content_original();
         update_option("blogname", $data);
-        return new InstinctResponse($data, INSTINCT_STATUS_OK);
+        return new InstinctResponse($data, INSTINCT_STATUS_OK, INSTINCT_IMODE_JSON, "", $orig);
+    }
+    
+    public function content_original()
+    {
+        
+        return get_option("blogname");
+      
     }
     
     public function render_interface($id) {
@@ -64,9 +72,9 @@ class InstinctHatchSiteDescription extends InstinctHatch {
     public $imode = INSTINCT_IMODE_CHAMELEON;
     
     public function save($id, $data) {
-
+        $orig = get_option("blogdescription");
         update_option("blogdescription", $data);
-        return new InstinctResponse($data, INSTINCT_STATUS_OK);
+        return new InstinctResponse($data, INSTINCT_STATUS_OK, INSTINCT_IMODE_JSON, "", $orig);
     }
     
     public function render_interface($id) {
